@@ -58,8 +58,13 @@ DARROW          =>
  /*
   *  Nested comments
   */
-"(*"    BEGIN(COMMENTS1);
-<COMMENTS1>"*)"   BEGIN(INITIAL);
+\(\*    BEGIN(COMMENTS1);
+<COMMENTS1>\*\)   BEGIN(INITIAL);
+<COMMENTS1><<EOF>> {
+                   BEGIN(INITIAL);
+                   cool_yylval.error_msg = "EOF in comment";
+                   return ERROR;
+                   }
 <COMMENTS1>. {}
 --      BEGIN(COMMENTS2);
 <COMMENTS2>\n {
@@ -74,23 +79,27 @@ DARROW          =>
   */
 {DARROW}		{ return (DARROW); }
 
-"<-" return ASSIGN;
-"<=" return LE;
+\<\- return ASSIGN;
+\<\= return LE;
 
+ /* single character */
 [.{}:;()+\-*/~<=,] return *yytext;
 
+ /* white space */
 [ \f\r\t\v] {}
+
 <COMMENTS1,INITIAL>\n curr_lineno++;
+
  /*
   * Keywords are case-insensitive except for the values true and false,
   * which must begin with a lower-case letter.
   */
-"true" {
+true {
      cool_yylval.boolean = true;
      return BOOL_CONST;
      }
 
-"false" {
+false {
      cool_yylval.boolean = false;
      return BOOL_CONST;
      }
@@ -134,12 +143,49 @@ DARROW          =>
          return OBJECTID;
          }
 
-\" BEGIN(STRING);
-<STRING>\" BEGIN(INITIAL);
-<STRING>([^"]|\\.)* {
-          cool_yylval.symbol = stringtable.add_string(yytext);
-          return STR_CONST;
-          }
+\" {
+   string_buf_ptr = string_buf;
+   BEGIN(STRING);
+   }
 
+<STRING>\" {
+           BEGIN(INITIAL);
+           *string_buf_ptr = '\0';
+           cool_yylval.symbol = stringtable.add_string(string_buf);
+           return STR_CONST;
+           }
+
+<STRING>{
+        "\\n"   *string_buf_ptr++ = '\n';
+        "\\t"   *string_buf_ptr++ = '\t';
+        "\\f"   *string_buf_ptr++ = '\f';
+        "\\b"   *string_buf_ptr++ = '\b';
+        }
+
+<STRING>\\. *string_buf_ptr++ = yytext[1];
+
+<STRING>\\\n {
+             curr_lineno++;
+             *string_buf_ptr++ = '\n';
+             }
+
+<STRING>[^\\\n\"]+ {
+                   char *yptr = yytext;
+                   while (*yptr) {
+                         *string_buf_ptr++ = *yptr++;
+                   }
+                   }
+
+
+<STRING>\n {
+           cool_yylval.error_msg = "Unterminated string constant";
+           curr_lineno++;
+           BEGIN(INITIAL);
+           return ERROR;
+           }
+[>'\[\]] {
+  cool_yylval.error_msg = yytext;
+  return ERROR;
+  }
 
 %%

@@ -17,6 +17,8 @@ ClAss Main {
       "String 1 \b \t \n \f";
       "String 2 \
       string 2 "
+      "string 3
+      myunescaped newline."
 }
 
 -- this is also oneline comment at end of file.
