@@ -17,7 +17,7 @@
 #define yylex  cool_yylex
 
 /* Max size of string constants */
-#define MAX_STR_CONST 1025
+#define MAX_STR_CONST 41
 #define YY_NO_UNPUT   /* keep g++ happy */
 
 extern FILE *fin; /* we read from this file */
@@ -33,6 +33,22 @@ extern FILE *fin; /* we read from this file */
 
 char string_buf[MAX_STR_CONST]; /* to assemble string constants */
 char *string_buf_ptr;
+int excess_string_size(void);
+int excess_string_size(void) {
+        size_t strsize = (string_buf_ptr - string_buf) / sizeof(char);
+        return strsize > MAX_STR_CONST;
+        }
+int add_char_to_string_buf(char c);
+int add_char_to_string_buf(char c) {
+     if (!excess_string_size()) {
+        *string_buf_ptr++ = c;
+        return 0;
+     } else {
+        cool_yylval.error_msg = "String constant too long";
+        return ERROR;
+     }
+     }
+
 
 extern int curr_lineno;
 extern int verbose_flag;
@@ -122,14 +138,6 @@ false {
 (?i:isvoid) return ISVOID;
 (?i:not) return NOT;
 
-
- /*
-  *  String constants (C syntax)
-  *  Escape sequence \c is accepted for all characters c. Except for
-  *  \n \t \b \f, the result is c.
-  *
-  */
-
 [0-9]+ {
          cool_yylval.symbol = inttable.add_string(yytext);
          return INT_CONST;
@@ -143,6 +151,13 @@ false {
          return OBJECTID;
          }
 
+ /*
+  *  String constants (C syntax)
+  *  Escape sequence \c is accepted for all characters c. Except for
+  *  \n \t \b \f, the result is c.
+  *
+  */
+
 \" {
    string_buf_ptr = string_buf;
    BEGIN(STRING);
@@ -150,32 +165,48 @@ false {
 
 <STRING>\" {
            BEGIN(INITIAL);
-           *string_buf_ptr = '\0';
-           cool_yylval.symbol = stringtable.add_string(string_buf);
-           return STR_CONST;
+           if (!excess_string_size()) {
+               *string_buf_ptr = '\0';
+               cool_yylval.symbol = stringtable.add_string(string_buf);
+               return STR_CONST;
+           } else {
+               cool_yylval.error_msg = "String constant too long";
+               return ERROR;
+           }
            }
 
 <STRING>{
-        "\\n"   *string_buf_ptr++ = '\n';
-        "\\t"   *string_buf_ptr++ = '\t';
-        "\\f"   *string_buf_ptr++ = '\f';
-        "\\b"   *string_buf_ptr++ = '\b';
+        "\\n"   add_char_to_string_buf('\n');
+        "\\t"   add_char_to_string_buf('\t');
+        "\\f"   add_char_to_string_buf('\f');
+        "\\b"   add_char_to_string_buf('\b');
         }
-
-<STRING>\\. *string_buf_ptr++ = yytext[1];
 
 <STRING>\\\n {
              curr_lineno++;
-             *string_buf_ptr++ = '\n';
+             add_char_to_string_buf('\n');
              }
+
+<STRING>\0 {
+           cool_yylval.error_msg = "String contains null character";
+           return ERROR;
+           }
+
+<STRING><<EOF>> {
+                BEGIN(INITIAL);
+                cool_yylval.error_msg = "EOF in string constant";
+                return ERROR;
+                }
+
+<STRING>\\. add_char_to_string_buf(yytext[1]);
 
 <STRING>[^\\\n\"]+ {
                    char *yptr = yytext;
                    while (*yptr) {
-                         *string_buf_ptr++ = *yptr++;
+                         /* TODO the excess_string_size checking doesn't work. */
+                         add_char_to_string_buf(*yptr++);
                    }
                    }
-
 
 <STRING>\n {
            cool_yylval.error_msg = "Unterminated string constant";
@@ -183,9 +214,11 @@ false {
            BEGIN(INITIAL);
            return ERROR;
            }
+           
+  /* illegal character. */
 [>'\[\]] {
-  cool_yylval.error_msg = yytext;
-  return ERROR;
-  }
+         cool_yylval.error_msg = yytext;
+         return ERROR;
+         }
 
 %%
