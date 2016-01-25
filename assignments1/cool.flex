@@ -221,4 +221,9 @@ false {
          return ERROR;
          }
 
+\*\) {
+     cool_yylval.error_msg = "Unmatched *)";
+     return ERROR;
+     }
+
 %%

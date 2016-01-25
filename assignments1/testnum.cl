@@ -21,7 +21,7 @@ ClAss Main {
       myunescaped newline."
 
       "string 4 \0 string4"
-
+      *)
       "this is long string string string g g skfjskdjfkjskfd asdkfjksdf
  ksfsdfasdfjklsdfjkl"
 -- this is also oneline comment at end of file.
