@@ -200,11 +200,6 @@ f(?i:alse) {
              add_char_to_string_buf('\n');
              }
 
-<STRING>\0 {
-           cool_yylval.error_msg = "String contains null character";
-           return ERROR;
-           }
-
 <STRING><<EOF>> {
                 BEGIN(INITIAL);
                 cool_yylval.error_msg = "EOF in string constant";
@@ -217,7 +212,7 @@ f(?i:alse) {
                    char *yptr = yytext;
                    while (*yptr) {
                          /* TODO the excess_string_size checking doesn't work. */
-                         add_char_to_string_buf(*yptr++);
+                           add_char_to_string_buf(*yptr++);
                    }
                    }
 
@@ -229,7 +224,7 @@ f(?i:alse) {
            }
            
   /* illegal character. */
-[_>'\[\]] {
+[!#$%^&?`|_>\\'\[\]] {
          cool_yylval.error_msg = yytext;
          return ERROR;
          }
