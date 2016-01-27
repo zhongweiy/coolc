@@ -17,7 +17,7 @@
 #define yylex  cool_yylex
 
 /* Max size of string constants */
-#define MAX_STR_CONST 41
+#define MAX_STR_CONST 1025
 #define YY_NO_UNPUT   /* keep g++ happy */
 
 extern FILE *fin; /* we read from this file */
@@ -68,20 +68,33 @@ extern YYSTYPE cool_yylval;
 DARROW          =>
 
 %x COMMENTS1 COMMENTS2 STRING
+%option stack
+
 %%
 
 
  /*
   *  Nested comments
   */
-\(\*    BEGIN(COMMENTS1);
-<COMMENTS1>\*\)   BEGIN(INITIAL);
+\(\*    {
+         yy_push_state(INITIAL);
+         BEGIN(COMMENTS1);
+         }
+<COMMENTS1>\\. {}
 <COMMENTS1><<EOF>> {
                    BEGIN(INITIAL);
                    cool_yylval.error_msg = "EOF in comment";
                    return ERROR;
                    }
+<COMMENTS1>\(\* {
+                yy_push_state(COMMENTS1);
+                BEGIN(COMMENTS1);
+                }
+<COMMENTS1>\*\) {
+                yy_pop_state();
+                }
 <COMMENTS1>. {}
+
 --      BEGIN(COMMENTS2);
 <COMMENTS2>\n {
                       BEGIN(INITIAL);
@@ -99,7 +112,7 @@ DARROW          =>
 \<\= return LE;
 
  /* single character */
-[.{}:;()+\-*/~<=,] return *yytext;
+[@.{}:;()+\-*/~<=,] return *yytext;
 
  /* white space */
 [ \f\r\t\v] {}
@@ -110,12 +123,12 @@ DARROW          =>
   * Keywords are case-insensitive except for the values true and false,
   * which must begin with a lower-case letter.
   */
-true {
+t(?i:rue) {
      cool_yylval.boolean = true;
      return BOOL_CONST;
      }
 
-false {
+f(?i:alse) {
      cool_yylval.boolean = false;
      return BOOL_CONST;
      }
@@ -216,7 +229,7 @@ false {
            }
            
   /* illegal character. */
-[>'\[\]] {
+[_>'\[\]] {
          cool_yylval.error_msg = yytext;
          return ERROR;
          }
