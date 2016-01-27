@@ -36,7 +36,8 @@ char *string_buf_ptr;
 int excess_string_size(void);
 int excess_string_size(void) {
         size_t strsize = (string_buf_ptr - string_buf) / sizeof(char);
-        return strsize > MAX_STR_CONST;
+        /* printf("strsize: %d\n", strsize); */
+        return strsize >= MAX_STR_CONST;
         }
 int add_char_to_string_buf(char c);
 /* TODO add_char_to_string_buf does not work. sometimes, we need no return. */
@@ -189,16 +190,27 @@ f(?i:alse) {
            }
            }
 
+<STRING>\0 {
+           BEGIN(INITIAL);
+           cool_yylval.error_msg = "String contains null character";
+           return ERROR;
+           }
+           
 <STRING>{
-        "\\n"   add_char_to_string_buf('\n');
-        "\\t"   add_char_to_string_buf('\t');
+        "\\n"   { int rc = add_char_to_string_buf('\n');
+                  if (rc) return rc;
+                  }
+        "\\t"   { int rc = add_char_to_string_buf('\t');
+                  if (rc) return rc;
+                  }
         "\\f"   add_char_to_string_buf('\f');
         "\\b"   add_char_to_string_buf('\b');
         }
 
 <STRING>\\\n {
              curr_lineno++;
-             add_char_to_string_buf('\n');
+             int rc = add_char_to_string_buf('\n');
+             if (rc) return rc;
              }
 
 <STRING><<EOF>> {
@@ -207,16 +219,17 @@ f(?i:alse) {
                 return ERROR;
                 }
 
-<STRING>\\. add_char_to_string_buf(yytext[1]);
+<STRING>\\. {
+              int rc = add_char_to_string_buf(yytext[1]);
+              if (rc) return rc;
+            }
 
 <STRING>[^\\\n\"]+ {
                    char *yptr = yytext;
                    while (*yptr) {
                          /* TODO checking still not work. */
                          int rc = add_char_to_string_buf(*yptr++);
-                         if (rc) {
-                            return rc;
-                         }
+                         if (rc) return rc;
                    }
                    }
 
