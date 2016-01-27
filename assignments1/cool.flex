@@ -211,8 +211,11 @@ f(?i:alse) {
 <STRING>[^\\\n\"]+ {
                    char *yptr = yytext;
                    while (*yptr) {
-                         /* TODO the excess_string_size checking doesn't work. */
-                           add_char_to_string_buf(*yptr++);
+                         /* TODO checking still not work. */
+                         int rc = add_char_to_string_buf(*yptr++);
+                         if (rc) {
+                            return rc;
+                         }
                    }
                    }
 
@@ -223,8 +226,10 @@ f(?i:alse) {
            return ERROR;
            }
            
-  /* illegal character. */
-[!#$%^&?`|_>\\'\[\]] {
+  /* illegal character.
+   * TODO \001\002\003\004 is hard coded here. Any other invisible character?
+   */
+[!#$%^&?`|_>\\'\[\]\001\002\003\004] {
          cool_yylval.error_msg = yytext;
          return ERROR;
          }
