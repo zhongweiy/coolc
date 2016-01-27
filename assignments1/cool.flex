@@ -39,6 +39,7 @@ int excess_string_size(void) {
         return strsize > MAX_STR_CONST;
         }
 int add_char_to_string_buf(char c);
+/* TODO add_char_to_string_buf does not work. sometimes, we need no return. */
 int add_char_to_string_buf(char c) {
      if (!excess_string_size()) {
         *string_buf_ptr++ = c;
