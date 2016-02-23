@@ -79,7 +79,7 @@ DARROW          =>
   *  Nested comments
   */
 \(\*    {
-         yy_push_state(INITIAL);
+         yy_push_state(INITIAL); /* handle nested comments. */
          BEGIN(COMMENTS1);
          }
 <COMMENTS1>\\. {}

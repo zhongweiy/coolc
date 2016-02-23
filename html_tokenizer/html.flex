@@ -7,12 +7,16 @@
 #define EQUAL 5 // '='
 #define STRING 6 // "1ab"
 #define WORD 7 // "hello" in "hello my html"
-#define JAVASCRIPT // embeded Javascript fragment
+#define JAVASCRIPT 8 // embeded Javascript fragment
+#define COMMENTS 9
+#define ERROR 10
+
 char *word;
 
 %}
  /* definitions */
 
+%x COMMENTS
 
 %%
  /* rules */
@@ -33,6 +37,21 @@ char *word;
 = {
    return EQUAL;
    }
+
+\<\!\-\- {
+         BEGIN(COMMENTS);
+         }
+         
+<COMMENTS>.|\n {}
+<COMMENTS><<EOF>> {
+                  BEGIN(INITIAL);
+                  return ERROR;
+                  }
+
+<COMMENTS>\-\-\> {
+                 BEGIN(INITIAL);
+                 }
+         
 
 [^ \t\v\r\n<>=]+ {
    word = yytext;
@@ -56,6 +75,7 @@ const char *token2string(int token) {
      case RANGLE: return "RANGLE"; break;
      case SLASHANGLE: return "SLASHANGLE"; break;
      case EQUAL: return "EQUAL"; break;
+     case ERROR: return "ERROR"; break;
      default: return "UNKNOWN token";
      }
 }
