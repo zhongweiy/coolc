@@ -1,1 +1,4 @@
-class A inherits B { };
+class B {
+a : INT <- b <- 4;
+b : INT <- 4;
+};
