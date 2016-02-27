@@ -188,14 +188,14 @@
     { $$ = method($1, $3, $6, $8); }
     | OBJECTID ':' TYPEID ';'
     { $$ = attr($1, $3, NULL); }
-    | OBJECTID ':' TYPEID DARROW expr ';'
+    | OBJECTID ':' TYPEID ASSIGN expr ';'
     { $$ = attr($1, $3, $5); }
 
     formal_part_list
     : /* empty */
     { $$ = nil_Formals(); }
     | formal_part_list ',' formal
-    { $$ = append_Formals($1, single_Formals($3); }
+    { $$ = append_Formals($1, single_Formals($3)); }
 
     formal_list
     : formal
@@ -206,8 +206,10 @@
     formal     : OBJECTID ':' TYPEID
     { $$ = formal($1, $3); }
 
-    expr       : OBJECTID DARROW expr
+    expr       : OBJECTID ASSIGN expr
     { $$ = assign($1, $3); }
+    | INT_CONST
+    { $$ = int_const($1); }
 
     /* end of grammar */
     %%
