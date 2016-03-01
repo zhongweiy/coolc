@@ -215,8 +215,8 @@
     { $$ = block($2); }
     | expr '.' OBJECTID '(' expr_list ')'
     { $$ = dispatch($1, $3, $5); }
-    | OBJECTID '(' ')'
-    { $$ = dispatch(object(idtable.add_string("Self")), $1, NULL); }
+    | OBJECTID '(' expr_list ')'
+    { $$ = dispatch(object(idtable.add_string("Self")), $1, $3); }
     | expr '@' TYPEID '.' OBJECTID '(' expr_list ')'
     { $$ = static_dispatch($1, $3, $5, $7); }
 
