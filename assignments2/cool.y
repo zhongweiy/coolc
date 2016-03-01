@@ -188,7 +188,7 @@
     feature     : OBJECTID '(' formal_list ')' ':' TYPEID '{' expr '}' ';'
     { $$ = method($1, $3, $6, $8); }
     | OBJECTID ':' TYPEID ';'
-    { $$ = attr($1, $3, NULL); }
+    { $$ = attr($1, $3, no_expr()); }
     | OBJECTID ':' TYPEID ASSIGN expr ';'
     { $$ = attr($1, $3, $5); }
 
@@ -211,14 +211,22 @@
     { $$ = assign($1, $3); }
     | INT_CONST
     { $$ = int_const($1); }
-    | '{' expr_block '}'
-    { $$ = block($2); }
     | expr '.' OBJECTID '(' expr_list ')'
     { $$ = dispatch($1, $3, $5); }
     | OBJECTID '(' expr_list ')'
     { $$ = dispatch(object(idtable.add_string("Self")), $1, $3); }
     | expr '@' TYPEID '.' OBJECTID '(' expr_list ')'
     { $$ = static_dispatch($1, $3, $5, $7); }
+    | IF expr THEN expr ELSE expr FI
+    { $$ = cond($2, $4, $6); }
+    | WHILE expr LOOP expr POOL
+    { $$ = loop($2, $4); }
+    | '{' expr_block '}'
+    { $$ = block($2); }
+    | LET OBJECTID ':' TYPEID IN expr
+    { $$ = let($2, $4, no_expr(), $6); }
+    | LET OBJECTID ':' TYPEID ASSIGN expr IN expr
+    { $$ = let($2, $4, $6, $8); }
 
     expr_list
     :
