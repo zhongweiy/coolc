@@ -141,6 +141,7 @@
     %type <formals> formal_list
     %type <formals> formal_part_list
     %type <formal> formal
+    %type <expressions> expr_block
     %type <expressions> expr_list
     %type <expressions> expr_part_list
     %type <expression> expr
@@ -192,16 +193,16 @@
     { $$ = attr($1, $3, $5); }
 
     formal_part_list
-    : /* empty */
+    :
     { $$ = nil_Formals(); }
     | formal_part_list ',' formal
     { $$ = append_Formals($1, single_Formals($3)); }
 
     formal_list
-    : formal
-    { $$ = single_Formals($1); }
-    | formal_part_list
-    { $$ = $1; }
+    :
+    { $$ = nil_Formals(); }
+    | formal formal_part_list
+    { $$ = append_Formals(single_Formals($1), $2); }
 
     formal     : OBJECTID ':' TYPEID
     { $$ = formal($1, $3); }
@@ -210,6 +211,32 @@
     { $$ = assign($1, $3); }
     | INT_CONST
     { $$ = int_const($1); }
+    | '{' expr_block '}'
+    { $$ = block($2); }
+    | expr '.' OBJECTID '(' expr_list ')'
+    { $$ = dispatch($1, $3, $5); }
+    | OBJECTID '(' ')'
+    { $$ = dispatch(object(idtable.add_string("Self")), $1, NULL); }
+    | expr '@' TYPEID '.' OBJECTID '(' expr_list ')'
+    { $$ = static_dispatch($1, $3, $5, $7); }
+
+    expr_list
+    :
+    { $$ = nil_Expressions(); }
+    | expr expr_part_list
+    { $$ = append_Expressions(single_Expressions($1), $2); }
+
+    expr_part_list
+    :
+    { $$ = nil_Expressions(); }
+    | expr_part_list ',' expr
+    { $$ = append_Expressions($1, single_Expressions($3)); }
+
+    expr_block
+    : expr ';'
+    { $$ = single_Expressions($1); }
+    | expr_block expr ';'
+    { $$ = append_Expressions($1, single_Expressions($2)); }
 
     /* end of grammar */
     %%

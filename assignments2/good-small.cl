@@ -1,4 +1,12 @@
 class B {
-a : INT <- b <- 4;
-b : INT <- 4;
+a : Int <- 4;
+
+foo (x : Int) : Int {
+     {
+      x <- 3;
+      y <- 1;
+      4;
+      }
+};
+
 };
