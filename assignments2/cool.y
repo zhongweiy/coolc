@@ -147,10 +147,10 @@
     %type <expression> expr
     %type <expression> let_multi_part
     %type <expression> let_multi
+    %type <cases> cases_list
+    %type <case_> case
 
     /* Precedence declarations go here. */
-
-
     %%
     /*
     Save the root of the abstract syntax tree in a global variable.
@@ -231,7 +231,18 @@
     { $$ = let($2, $4, $6, $8); }
     | let_multi
     { $$ = $1; }
+    | CASE expr OF cases_list ESAC
+    { $$ = typcase($2, $4); }
 
+    case
+    : OBJECTID ':' TYPEID DARROW expr ';'
+    { $$ = branch($1, $3, $5); }
+
+    cases_list
+    : case 
+    { $$ = single_Cases($1); }
+    | cases_list case
+    { $$ = append_Cases($1, single_Cases($2)); }
 
     let_multi_part
     : ',' OBJECTID ':' TYPEID IN expr

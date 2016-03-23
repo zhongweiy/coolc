@@ -13,15 +13,27 @@ foo (x : Int) : Int {
       (* static dispatch *)
       10@Int.foo();
 
-      if 3 then 4 else 5 fi;
+      if 3
+        then 4
+        else 5
+      fi;
 
       while 3 loop 3 pool;
 
+      (* let expression *)
       let x : Int <- 3 in 3;
       let x : Int in 3;
       let x : Int <- 3, y : Int <- 4 in 5;
       let x : Int <- 3, y : Int in 5;
       let x : Int, y : Int <- 4 in 5;
+
+      (* case expression *)
+      case 3 of x : Int => 3; esac;
+      
+      case 3 of
+           x : Int => 3;
+           y : Int => 4;
+      esac;
       }
 };
 };
