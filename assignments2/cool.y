@@ -145,6 +145,8 @@
     %type <expressions> expr_list
     %type <expressions> expr_part_list
     %type <expression> expr
+    %type <expression> let_multi_part
+    %type <expression> let_multi
 
     /* Precedence declarations go here. */
 
@@ -227,6 +229,21 @@
     { $$ = let($2, $4, no_expr(), $6); }
     | LET OBJECTID ':' TYPEID ASSIGN expr IN expr
     { $$ = let($2, $4, $6, $8); }
+    | let_multi
+    { $$ = $1; }
+
+
+    let_multi_part
+    : ',' OBJECTID ':' TYPEID IN expr
+    { $$ = let($2, $4, no_expr(), $6); }
+    | ',' OBJECTID ':' TYPEID ASSIGN expr IN expr
+    { $$ = let($2, $4, $6, $8); }
+
+    let_multi
+    : LET OBJECTID ':' TYPEID let_multi_part
+    { $$ = let($2, $4, no_expr(), $5); }
+    | LET OBJECTID ':' TYPEID ASSIGN expr let_multi_part
+    { $$ = let($2, $4, $6, $7); }
 
     expr_list
     :

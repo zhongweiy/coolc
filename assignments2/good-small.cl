@@ -19,6 +19,9 @@ foo (x : Int) : Int {
 
       let x : Int <- 3 in 3;
       let x : Int in 3;
+      let x : Int <- 3, y : Int <- 4 in 5;
+      let x : Int <- 3, y : Int in 5;
+      let x : Int, y : Int <- 4 in 5;
       }
 };
 };
