@@ -149,7 +149,7 @@
     %type <expression> let_multi
     %type <cases> cases_list
     %type <case_> case
-    
+
     /* Precedence declarations go here. */
     %%
     /*
@@ -232,18 +232,30 @@
     | let_multi
     { $$ = $1; }
     | CASE expr OF cases_list ESAC
-    { $$ = typcase($2, $4); }
+    {
+        SET_NODELOC(@1);
+        $$ = typcase($2, $4);
+    }
     | NEW TYPEID
-    { $$ = new_($2); }
+    {
+        SET_NODELOC(@1);
+        $$ = new_($2);
+    }
     | ISVOID expr
-    { $$ = isvoid($2); }
+    {
+        SET_NODELOC(@1);
+        $$ = isvoid($2);
+    }
 
     case
     : OBJECTID ':' TYPEID DARROW expr ';'
-    { $$ = branch($1, $3, $5); }
+    {
+        SET_NODELOC(@1);
+        $$ = branch($1, $3, $5);
+    }
 
     cases_list
-    : case 
+    : case
     { $$ = single_Cases($1); }
     | cases_list case
     { $$ = append_Cases($1, single_Cases($2)); }
