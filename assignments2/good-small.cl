@@ -34,6 +34,10 @@ foo (x : Int) : Int {
            x : Int => 3;
            y : Int => 4;
       esac;
+
+      new Int;
+      isvoid 3;
       }
+
 };
 };

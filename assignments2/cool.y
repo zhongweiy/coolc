@@ -149,7 +149,7 @@
     %type <expression> let_multi
     %type <cases> cases_list
     %type <case_> case
-
+    
     /* Precedence declarations go here. */
     %%
     /*
@@ -233,6 +233,10 @@
     { $$ = $1; }
     | CASE expr OF cases_list ESAC
     { $$ = typcase($2, $4); }
+    | NEW TYPEID
+    { $$ = new_($2); }
+    | ISVOID expr
+    { $$ = isvoid($2); }
 
     case
     : OBJECTID ':' TYPEID DARROW expr ';'
@@ -273,6 +277,7 @@
     { $$ = single_Expressions($1); }
     | expr_block expr ';'
     { $$ = append_Expressions($1, single_Expressions($2)); }
+
 
     /* end of grammar */
     %%
