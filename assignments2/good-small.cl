@@ -26,8 +26,8 @@ foo (x : Int) : Int {
       let x : Int <- 3, y : Int <- 4 in 5;
       let x : Int <- 3, y : Int in 5;
       let x : Int, y : Int <- 4 in 5;
-      ( * why following syntax not work? * )
-      ( * , y : Int <- 4 in 5; *)
+      (* why following syntax not work? *)
+      (* , y : Int <- 4 in 5; *)
 
       (* case expression *)
       case 3 of x : Int => 3; esac;
@@ -40,6 +40,21 @@ foo (x : Int) : Int {
       new Int;
       isvoid 3;
 
+      3 + 3;
+      4 - 3;
+      4 * 3;
+      4 / 3;
+      ~ 4;
+      3 < 4;
+      4 <= 3;
+      3 = 3;
+      NOT 3;
+      (NOT 3);
+      3 + (3 - 3);
+      x;
+      "hello";
+      true;
+      false;
       }
 
 };

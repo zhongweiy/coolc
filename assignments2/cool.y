@@ -211,8 +211,6 @@
 
     expr       : OBJECTID ASSIGN expr
     { $$ = assign($1, $3); }
-    | INT_CONST
-    { $$ = int_const($1); }
     | expr '.' OBJECTID '(' expr_list ')'
     { $$ = dispatch($1, $3, $5); }
     | OBJECTID '(' expr_list ')'
@@ -245,6 +243,73 @@
     {
         SET_NODELOC(@1);
         $$ = isvoid($2);
+    }
+    | expr '+' expr
+    {
+        SET_NODELOC(@1);
+        $$ = plus($1, $3);
+    }
+    | expr '-' expr
+    {
+        SET_NODELOC(@1);
+        $$ = sub($1, $3);
+    }
+    | expr '*' expr
+    {
+        SET_NODELOC(@1);
+        $$ = mul($1, $3);
+    }
+    | expr '/' expr
+    {
+        SET_NODELOC(@1);
+        $$ = divide($1, $3);
+    }
+    | '~' expr
+    {
+        SET_NODELOC(@1);
+        $$ = neg($2);
+    }
+    | expr '<' expr
+    {
+        SET_NODELOC(@1);
+        $$ = lt($1, $3);
+    }
+    | expr LE expr
+    {
+        SET_NODELOC(@1);
+        $$ = leq($1, $3);
+    }
+    | expr '=' expr
+    {
+        SET_NODELOC(@1);
+        $$ = eq($1, $3);
+    }
+    | NOT expr
+    {
+        SET_NODELOC(@1);
+        $$ = comp($2);
+    }
+    | '(' expr ')'
+    {
+        SET_NODELOC(@1);
+        $$ = $2;
+    }
+    | OBJECTID
+    {
+        SET_NODELOC(@1);
+        $$ = object($1);
+    }
+    | INT_CONST
+    { $$ = int_const($1); }
+    | STR_CONST
+    {
+        SET_NODELOC(@1);
+        $$ = string_const($1);
+    }
+    | BOOL_CONST
+    {
+        SET_NODELOC(@1);
+        $$ = bool_const($1);
     }
 
     case
