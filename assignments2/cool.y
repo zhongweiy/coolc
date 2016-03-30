@@ -151,6 +151,15 @@
     %type <case_> case
 
     /* Precedence declarations go here. */
+    %precedence ASSIGN
+    %precedence NOT
+    %nonassoc '=' LE '<'
+    %left '-' '+'
+    %left '/' '*'
+    %precedence ISVOID
+    %precedence '~'
+    %precedence '@'
+    %precedence '.'
     %%
     /*
     Save the root of the abstract syntax tree in a global variable.
@@ -169,8 +178,11 @@
 
     /* If no parent is specified, the class inherits from the Object class. */
     class	: CLASS TYPEID '{' feature_list '}' ';'
-    { $$ = class_($2,idtable.add_string("Object"),$4,
-    stringtable.add_string(curr_filename)); }
+    {
+        SET_NODELOC(@6);
+        $$ = class_($2,idtable.add_string("Object"),$4,
+                    stringtable.add_string(curr_filename));
+    }
     | CLASS TYPEID INHERITS TYPEID '{' feature_list '}' ';'
     { $$ = class_($2,$4,$6,stringtable.add_string(curr_filename)); }
     ;
