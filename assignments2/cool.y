@@ -201,6 +201,8 @@
     { $$ = append_Features($1, single_Features($2)); }
     | /* empty */
     { $$ = nil_Features(); }
+    | error feature
+    { $$ = single_Features($2); }
 
     feature     : OBJECTID '(' formal_list ')' ':' TYPEID '{' expr '}' ';'
     { $$ = method($1, $3, $6, $8); }
@@ -346,6 +348,7 @@
     | ',' OBJECTID ':' TYPEID ASSIGN expr IN expr
     { $$ = let($2, $4, $6, $8); }
 
+    // let multiple binding.
     let_multi
     : LET OBJECTID ':' TYPEID let_multi_part
     { $$ = let($2, $4, no_expr(), $5); }
@@ -369,7 +372,8 @@
     { $$ = single_Expressions($1); }
     | expr_block expr ';'
     { $$ = append_Expressions($1, single_Expressions($2)); }
-
+    | error ';' expr ';'
+    { $$ = single_Expressions($3); }
 
     /* end of grammar */
     %%

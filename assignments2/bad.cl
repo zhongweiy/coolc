@@ -26,4 +26,3 @@ Class D inherts A {
 (* error:  closing brace is missing *)
 Class E inherits A {
 ;
-
