@@ -81,10 +81,7 @@ static void initialize_constants(void)
     val         = idtable.add_string("_val");
 }
 
-
-
 ClassTable::ClassTable(Classes classes) : semant_errors(0) , error_stream(cerr) {
-    /* Fill this in */
     SymbolTable<Symbol, Class__class> *class_graph = install_basic_classes();
 
     addto_class_graph(class_graph, classes);
@@ -98,7 +95,13 @@ ClassTable::ClassTable(Classes classes) : semant_errors(0) , error_stream(cerr) 
 
 bool ClassTable::check_parents_is_defined(SymbolTable<Symbol, Class__class> * class_graph,
                                           Classes classes) {
-    // TODO
+    for (int i = classes->first(); classes->more(i); i = classes->next(i)) {
+        Class_ c = classes->nth(i);
+        if (class_graph->lookup(c->get_parent()) == NULL) {
+            // TODO put error to semant_errors.
+            return false;
+        }
+    }
     return true;
 }
 
