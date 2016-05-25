@@ -110,11 +110,14 @@ bool ClassTable::inheritance_is_acyclic(SymbolTable<Symbol, Class__class>* class
 
 void ClassTable::addto_class_graph(SymbolTable<Symbol, Class__class> *class_graph,
                                    Classes classes) {
-    class_graph->enterscope();
+    //class_graph->dump();
+    // TODO does enterscope is still needed as it is called in install_basic_classes?
+    // class_graph->enterscope();
     for (int i = classes->first(); classes->more(i); i = classes->next(i)) {
         class_graph->addid(classes->nth(i)->get_name(),
                            classes->nth(i));
     }
+    //class_graph->dump();
 }
 
 SymbolTable<Symbol, Class__class> *ClassTable::install_basic_classes() {
