@@ -2,7 +2,8 @@
 #define SEMANT_H_
 
 #include <assert.h>
-#include <iostream>  
+#include <iostream>
+#include <string>
 #include "cool-tree.h"
 #include "stringtab.h"
 #include "symtab.h"
@@ -35,6 +36,7 @@ public:
   ostream& semant_error();
   ostream& semant_error(Class_ c);
   ostream& semant_error(Symbol filename, tree_node *t);
+  ostream& semant_error(Class_ c, const std::string& msg);
 };
 
 

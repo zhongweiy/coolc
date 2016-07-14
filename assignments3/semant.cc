@@ -98,11 +98,12 @@ bool ClassTable::check_parents_is_defined(SymbolTable<Symbol, Class__class> * cl
     for (int i = classes->first(); classes->more(i); i = classes->next(i)) {
         Class_ c = classes->nth(i);
         if (class_graph->lookup(c->get_parent()) == NULL) {
-            // TODO put error to semant_errors.
+        	semant_error(c, "Parents is not defined.");
             return false;
         }
     }
     return true;
+
 }
 
 bool ClassTable::inheritance_is_acyclic(SymbolTable<Symbol, Class__class>* class_graph,
@@ -249,7 +250,16 @@ SymbolTable<Symbol, Class__class> *ClassTable::install_basic_classes() {
 //    ostream& ClassTable::semant_error(Symbol filename, tree_node *t)  
 //       print a line number and filename
 //
+//    ostream& ClassTable::semant_error(Class_ c, const std::string& msg)
+//       print a line number and filename and msg for 'c'
+//
 ///////////////////////////////////////////////////////////////////
+
+ostream& ClassTable::semant_error(Class_ c, const std::string& msg)
+{
+	error_stream << msg << ":";
+	return semant_error(c);
+}
 
 ostream& ClassTable::semant_error(Class_ c)
 {                                                             
