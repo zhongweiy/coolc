@@ -257,8 +257,8 @@ SymbolTable<Symbol, Class__class> *ClassTable::install_basic_classes() {
 
 ostream& ClassTable::semant_error(Class_ c, const std::string& msg)
 {
-	error_stream << msg << ":";
-	return semant_error(c);
+	semant_error(c) << msg << endl;
+	return error_stream;
 }
 
 ostream& ClassTable::semant_error(Class_ c)
