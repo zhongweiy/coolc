@@ -98,7 +98,7 @@ bool ClassTable::check_parents_is_defined(SymbolTable<Symbol, Class__class> * cl
     for (int i = classes->first(); classes->more(i); i = classes->next(i)) {
         Class_ c = classes->nth(i);
         if (class_graph->lookup(c->get_parent()) == NULL) {
-        	semant_error(c, "Parents is not defined.");
+            semant_error(c, "Parents is not defined.");
             return false;
         }
     }

@@ -1,5 +1,4 @@
 class B inherits C {
-	
 };
 
 class C inherits B{
