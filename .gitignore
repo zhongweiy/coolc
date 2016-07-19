@@ -2,3 +2,8 @@
 *~
 *.out
 compile_commands.json
+\#*\#
+.cproject
+.cvs*
+.project
+*.class
