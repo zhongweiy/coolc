@@ -108,7 +108,20 @@ bool ClassTable::check_parents_is_defined(SymbolTable<Symbol, Class__class> * cl
 
 bool ClassTable::inheritance_is_acyclic(SymbolTable<Symbol, Class__class>* class_graph,
                                         Classes classes) {
-    // TODO
+    for (int i = classes->first(); classes->more(i); i = classes->next(i)) {
+        Class_ c0 = classes->nth(i);
+        Symbol parent = c0->get_parent();
+        while(parent != No_class) {
+            Class_ c1 = class_graph->lookup(parent);
+            if (c1 == c0) {
+                // TODO print inheritance cycle in error message.
+                std::string msg = c0->get_name()->get_string();
+                semant_error(c0,  msg.append(" Class is inheritance cyclic."));
+                return false;
+            }
+            parent = c1->get_parent();
+        }
+    }
     return true;
 }
 
