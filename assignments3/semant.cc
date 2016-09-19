@@ -88,7 +88,8 @@ ClassTable::ClassTable(Classes classes) : semant_errors(0) , error_stream(cerr) 
 
     if (check_parents_is_defined(class_graph, classes)) {
         if (inheritance_is_acyclic(class_graph, classes)) {
-            // do other semantic checking
+            if (!inherit_from_bool(classes)){}
+            // TODO do other semantic checking
         }
     }
 }
@@ -103,7 +104,6 @@ bool ClassTable::check_parents_is_defined(SymbolTable<Symbol, Class__class> * cl
         }
     }
     return true;
-
 }
 
 bool ClassTable::inheritance_is_acyclic(SymbolTable<Symbol, Class__class>* class_graph,
@@ -123,6 +123,19 @@ bool ClassTable::inheritance_is_acyclic(SymbolTable<Symbol, Class__class>* class
         }
     }
     return true;
+}
+
+bool ClassTable::inherit_from_bool(Classes classes) {
+    for (int i = classes->first(); classes->more(i); i = classes->next(i)) {
+        Class_ c = classes->nth(i);
+        Symbol parent = c->get_parent();
+        if (parent->equal_string("Bool", 4)) {
+            std::string msg = c->get_name()->get_string();
+            semant_error(c,  msg.append(" Class inherit from Bool (it is an error by cool-manual section 8.5)."));
+            return true;
+        }
+    }
+    return false;
 }
 
 void ClassTable::addto_class_graph(SymbolTable<Symbol, Class__class> *class_graph,
