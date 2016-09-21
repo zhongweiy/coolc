@@ -29,7 +29,7 @@ private:
   bool inheritance_is_acyclic(SymbolTable<Symbol, Class__class>*, Classes);
   void addto_class_graph(SymbolTable<Symbol, Class__class> *, Classes);
   bool check_parents_is_defined(SymbolTable<Symbol, Class__class> *, Classes);
-  bool inherit_from_bool(Classes);
+  bool inherit_from_restricted_baseclass(Classes);
 
 public:
   ClassTable(Classes);
